@@ -57,3 +57,5 @@ function renderImg(data) {
     .join('');
   galleryDiv.insertAdjacentHTML('beforeend', markup);
 }
+
+export { limitPage, serchImg, renderImg };
