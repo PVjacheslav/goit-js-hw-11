@@ -88,3 +88,5 @@ function loadMorePage() {
     onLoadMore();
   }
 }
+
+export { galleryDiv };
