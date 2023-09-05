@@ -46,7 +46,7 @@ function renderImg(data) {
       }) => {
         return `<a class="photo-link" href="${largeImageURL}">
           <div class="photo-card">
-            <img src="${webformatURL}" alt="${tags}" loading="lazy" />
+            <img class="img" src="${webformatURL}" alt="${tags}" loading="lazy" />
             <div class="info">
               <p class="info-item">
                 <b>${likes}</b>
