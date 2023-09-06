@@ -46,21 +46,25 @@ function renderImg(data) {
       }) => {
         return `<a class="photo-link" href="${largeImageURL}">
           <div class="photo-card">
-            <img class="img" src="${webformatURL}" alt="${tags}" loading="lazy" />
-            <div class="info">
-              <p class="info-item">
-                <b>${likes}</b>
-              </p>
-              <p class="info-item">
-                <b>${views}</b>
-              </p>
-              <p class="info-item">
-                <b>${comments}</b>
-              </p>
-              <p class="info-item">
-                <b>${downloads}</b>
-              </p>
-            </div>
+            <img class "img" src="${webformatURL}" alt="${tags}" loading="lazy" />
+            <ul class="info">
+              <li class="info-item">
+                Likes
+                <p>${likes}</p>
+              </li>
+              <li class="info-item">
+                Views
+                <p>${views}</p>
+              </li>
+              <li class="info-item">
+                Comments
+                <p>${comments}</p>
+              </li>
+              <li class="info-item">
+                Downloads
+                <p>${downloads}</p>
+              </li>
+          </ul>
           </div>
         </a>`;
       }
