@@ -6,7 +6,7 @@ import Notiflix, { Loading, Notify } from 'notiflix';
 import axios from 'axios';
 const API_KEY = '39210182-6a28ff40429aa6ef86c4432d6';
 axios.defaults.baseURL = 'https://pixabay.com/api/';
-const limitPage = 40;
+
 import { limitPage, serchImg, renderImg } from './additional';
 
 const elements = {
