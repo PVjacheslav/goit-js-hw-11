@@ -2,6 +2,14 @@ import axios from 'axios';
 const API_KEY = '39210182-6a28ff40429aa6ef86c4432d6';
 const limitPage = 40;
 axios.defaults.baseURL = 'https://pixabay.com/api/';
+
+const elements = {
+  serchForm: document.querySelector('.js-search-form'),
+  divGallery: document.querySelector('.gallery'),
+  buttonLoad: document.querySelector('.load-more'),
+  container: document.querySelector('.js-list'),
+};
+
 const serchImg = async (querySerch, pageSerch) => {
   try {
     const { data } = await axios({
@@ -56,7 +64,7 @@ function renderImg(data) {
       }
     )
     .join('');
-  galleryDiv.insertAdjacentHTML('beforeend', markup);
+  elements.divGallery.insertAdjacentHTML('beforeend', markup);
 }
 
 export { limitPage, serchImg, renderImg };

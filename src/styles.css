@@ -57,12 +57,12 @@ button {
   margin: 16px auto;
   padding-top: 4px;
   padding-bottom: 4px;
-  display: block;
+  display: inline-block;
   box-shadow: 0 4px 4px rgba(0, 0, 0, 0.15);
 }
 
 .is-hidden {
   opacity: 0;
-  visibility: hidden;
+  display: none;
   pointer-events: none;
 }

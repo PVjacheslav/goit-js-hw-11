@@ -7,71 +7,7 @@ import axios from 'axios';
 const API_KEY = '39210182-6a28ff40429aa6ef86c4432d6';
 const limitPage = 40;
 axios.defaults.baseURL = 'https://pixabay.com/api/';
-
-const serchImg = async (querySerch, pageSerch) => {
-  try {
-    const response = await axios({
-      params: {
-        key: API_KEY,
-        q: querySerch,
-        image_type: 'photo',
-        orientation: 'horizontal',
-        safesearch: 'true',
-        per_page: limitPage,
-        page: pageSerch,
-      },
-    });
-    if (response.data) {
-      return response.data;
-    } else {
-      throw new Error('Отримано порожню відповідь від сервера');
-    }
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-};
-
-function renderImg(data) {
-  const markup = data.hits
-    .map(
-      ({
-        webformatURL,
-        largeImageURL,
-        tags,
-        likes,
-        views,
-        comments,
-        downloads,
-      }) => {
-        return `<a class="photo-link" href="${largeImageURL}">
-          <div class="photo-card">
-            <img class "img" src="${webformatURL}" alt="${tags}" loading="lazy" />
-            <ul class="info">
-              <li class="info-item">
-                Likes
-                <p>${likes}</p>
-              </li>
-              <li class="info-item">
-                Views
-                <p>${views}</p>
-              </li>
-              <li class="info-item">
-                Comments
-                <p>${comments}</p>
-              </li>
-              <li class="info-item">
-                Downloads
-                <p>${downloads}</p>
-              </li>
-          </ul>
-          </div>
-        </a>`;
-      }
-    )
-    .join('');
-  galleryDiv.insertAdjacentHTML('beforeend', markup);
-}
+import { limitPage, serchImg, renderImg } from './additional';
 
 const elements = {
   serchForm: document.querySelector('.js-search-form'),
@@ -80,13 +16,17 @@ const elements = {
   container: document.querySelector('.js-list'),
 };
 
-const galleryDiv = elements.divGallery;
-
 let querySerch = '';
 let pageSerch = 1;
+elements.serchForm.addEventListener('submit', onSubmitForm);
+
 const simpleBox = new SimpleLightbox('.gallery a', {
   captionsData: 'alt',
   captionDelay: 250,
+});
+
+const obsScroll = new IntersectionObserver(onObsScroll, {
+  rootMargin: '300px',
 });
 
 function onSubmitForm(e) {
@@ -96,13 +36,12 @@ function onSubmitForm(e) {
     return;
   }
   querySerch = query;
-  galleryDiv.innerHTML = '';
+  elements.divGallery.innerHTML = '';
   pageSerch = 1;
   firstNumberImg(querySerch, pageSerch);
   elements.serchForm.reset();
 }
 
-elements.serchForm.addEventListener('submit', onSubmitForm);
 const firstNumberImg = async (query, pageSerch) => {
   try {
     Loading.circle('Loading', {
@@ -120,39 +59,66 @@ const firstNumberImg = async (query, pageSerch) => {
     simpleBox.refresh();
     if (pageSerch === 1) {
       Notify.success(`We found ${data.totalHits} images.`);
+      obsScroll.observe(elements.target);
+    }
+    if (data.totalHits <= pageSerch * limitPage) {
+      Notify.failure(
+        "We're sorry, but you've reached the end of search results."
+      );
     }
   } catch (error) {
-    console.error(error);
+    // console.error(error);
     Notify.failure('Oops! Try again!');
   }
 };
 
-function onLoadMore() {
-  pageSerch += 1;
-  simpleBox.refresh();
-  firstNumberImg(querySerch, pageSerch)
-    .then(data => {
-      renderImg(data.hits);
-      simpleBox.refresh();
-      const totalPages = Math.ceil(data.totalHits / limitPage);
-      if (pageSerch > totalPages) {
-        Notify.failure(
-          "We're sorry, but you've reached the end of the possible results"
-        );
-      }
-    })
-    .catch(error => console.error(error));
+function onObsScroll(entries) {
+  entries.forEach(entry => {
+    console.log(entry);
+    if (entry.isIntersecting) {
+      pageSerch += 1;
+
+      fetchImg(querySerch, pageSerch)
+        .then(data => {
+          renderImg(data);
+          simpleBox.refresh();
+          if (pageSerch > data.totalHits / limitPage) {
+            obsScroll.unobserve(elements.target);
+          }
+        })
+        .catch(err => Notify.failure(err.message))
+        .finally(() => Loading.remove());
+    }
+  });
 }
 
-function checkEndPage() {
-  return (
-    window.innerHeight + window.scrollY >= document.documentElement.scrollHeight
-  );
-}
+// function onLoadMore() {
+//   pageSerch += 1;
+//   simpleBox.refresh();
+//   firstNumberImg(querySerch, pageSerch)
+//     .then(data => {
+//       renderImg(data.hits);
+//       simpleBox.refresh();
+//       const totalPages = Math.ceil(data.totalHits / limitPage);
+//       console.log(limitPage);
+//       if (pageSerch > totalPages) {
+//         Notify.failure(
+//           "We're sorry, but you've reached the end of the possible results"
+//         );
+//       }
+//     })
+//     .catch(error => console.error(error));
+// }
 
-window.addEventListener('scroll', loadMorePage);
-function loadMorePage() {
-  if (checkEndPage()) {
-    onLoadMore();
-  }
-}
+// function checkEndPage() {
+//   return (
+//     window.innerHeight + window.scrollY >= document.documentElement.scrollHeight
+//   );
+// }
+
+// window.addEventListener('scroll', loadMorePage);
+// function loadMorePage() {
+//   if (checkEndPage()) {
+//     onLoadMore();
+//   }
+// }
